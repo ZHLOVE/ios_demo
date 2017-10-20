@@ -234,7 +234,7 @@ TARGETS->General->Linked Frameworks and Libraries
 #### 代码对接
 ##### 1、开启缓存
 ```
-[[QHVCLocalServerKit sharedInstance] startServer:path deviceId:"设备Id" appId:@"申请的appId"];//path必须是已经存在的目录
+[[QHVCLocalServerKit sharedInstance] startServer:path deviceId:"设备Id" appId:@"申请的appId" cacheSize:cacheSizeInMB];//path必须是已经存在的目录
 ```
 ##### 2、停止缓存
 ```
@@ -272,8 +272,9 @@ urlString = url;
 设置和调整缓存占用空间大小。 这个接口可以中途调用，可以调用多次
 
 @param cacheSizeInMB 缓存空间的大小， 单位:MB
+@return yes:成功 no:失败
 */
-- (void)setCacheSize:(int)cacheSizeInMB;
+- (BOOL)setCacheSize:(int)cacheSizeInMB;
 业务方可随时调用-(void)clearCache接口清除当前占用的空间（该接口不会影响当前正在播放的任务）。
 
 /**
