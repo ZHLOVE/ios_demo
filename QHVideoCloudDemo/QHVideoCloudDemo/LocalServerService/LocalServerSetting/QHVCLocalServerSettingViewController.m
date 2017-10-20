@@ -82,7 +82,7 @@
                 {
                     [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
                 }
-                [localServer startServer:path deviceId:[weakSelf getUUIDString] appId:@"Demo"];
+                [localServer startServer:path deviceId:[weakSelf getUUIDString] appId:@"Demo" cacheSize:200];
             }
             else
             {

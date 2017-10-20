@@ -53,7 +53,7 @@ TARGETS->General->Linked Frameworks and Libraries
 #### 代码对接
 ##### 1、开启缓存
 ```
-[[QHVCLocalServerKit sharedInstance] startServer:path deviceId:"设备Id" appId:@"申请的appId"];//path必须是已经存在的目录
+[[QHVCLocalServerKit sharedInstance] startServer:path deviceId:"设备Id" appId:@"申请的appId" cacheSize:cacheSizeInMB];//path必须是已经存在的目录
 ```
 ##### 2、停止缓存
 ```
@@ -91,8 +91,9 @@ urlString = url;
 设置和调整缓存占用空间大小。 这个接口可以中途调用，可以调用多次
 
 @param cacheSizeInMB 缓存空间的大小， 单位:MB
+@return yes:成功 no:失败
 */
-- (void)setCacheSize:(int)cacheSizeInMB;
+- (BOOL)setCacheSize:(int)cacheSizeInMB;
 业务方可随时调用-(void)clearCache接口清除当前占用的空间（该接口不会影响当前正在播放的任务）。
 
 /**
@@ -250,9 +251,10 @@ NSLog和Android的Log函数可以自带这些信息时，可以设置成0
 
 @param cacheDir 缓存目录，要保证是一个当前存在且有读写权限的文件夹
 @param deviceId 设备Id， 统计上报会带上，追查问题用
-@param appId    业务Id， 统计上报会带上，追查问题用
+@param appId 业务Id， 统计上报会带上，追查问题用
+@param cacheSizeInMB 初始缓存大小 单位：MB
 */
-- (void)startServer:(NSString *)cacheDir deviceId:(NSString *)deviceId appId:(NSString *)appId;
+- (void)startServer:(NSString *)cacheDir deviceId:(NSString *)deviceId appId:(NSString *)appId cacheSize:(int)cacheSizeInMB;
 ```
 
 ```Objective-C

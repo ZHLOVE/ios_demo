@@ -149,7 +149,7 @@
         {
             [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
         }
-        [[QHVCLocalServerKit sharedInstance] startServer:path deviceId:[self getUUIDString] appId:@"Demo"];
+        [[QHVCLocalServerKit sharedInstance] startServer:path deviceId:[self getUUIDString] appId:@"Demo" cacheSize:200];
         
         [defaults setBool:YES forKey:@"localServerKey"];
         [defaults synchronize];
@@ -164,7 +164,7 @@
         {
             [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
         }
-        [[QHVCLocalServerKit sharedInstance] startServer:path deviceId:[self getUUIDString] appId:@"Demo"];
+        [[QHVCLocalServerKit sharedInstance] startServer:path deviceId:[self getUUIDString] appId:@"Demo" cacheSize:200];
     }
     
     if ([defaults valueForKey:@"enableCache"] != nil )
