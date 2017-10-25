@@ -176,7 +176,7 @@ QHVCPlayerErrorDetailedInfo
 | 14 | prepare failed |
 
 ### SDK日志文件：
-本地路径Library/Cache/com.qihoo.videocloud/QHVCPlayer
+本地路径Library/Cache/com.qihoo.videocloud/log/QHVCPlayer
 
 
 # iOS LocalServer SDK开发文档
@@ -310,7 +310,7 @@ urlString = url;
 2、加防盗链或可变的URL无法作为视频的唯一标识，必须正确设置rid参数
 
 ### SDK日志文件：
-本地路径Library/Cache/com.qihoo.videocloud/QHVCLocalServer
+本地路径Library/Cache/com.qihoo.videocloud/log/QHVCLocalServer
 
 
 # iOS上传SDK开发文档

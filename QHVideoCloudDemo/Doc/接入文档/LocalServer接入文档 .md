@@ -277,4 +277,4 @@ NSLog和Android的Log函数可以自带这些信息时，可以设置成0
 2、加防盗链或可变的URL无法作为视频的唯一标识，必须正确设置rid参数
 
 ### SDK日志文件：
-本地路径Library/Cache/com.qihoo.videocloud/QHVCLocalServer
+本地路径Library/Cache/com.qihoo.videocloud/log/QHVCLocalServer

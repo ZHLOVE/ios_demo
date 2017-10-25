@@ -145,7 +145,7 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
 /**
  测试用
 
- @param mediaInfo 视频详细参数(点播专用)
+ @param mediaInfo 视频详细参数
  */
 - (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *_Nullable)mediaInfo player:(QHVCPlayer *_Nonnull)player;
 
