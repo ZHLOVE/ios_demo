@@ -328,7 +328,7 @@ kbd {
 
 <body>
 
-<div><pre><code class="language-Objective-C">typedef NS_ENUM(NSInteger, QHVCPlayerDecodingType)
+<div><pre><code class="language-none">typedef NS_ENUM(NSInteger, QHVCPlayerDecodingType)
 {
     QHVCMediaInfoDecodeFormateH264    = 0,//正在解码的是h264
     QHVCMediaInfoDecodeFormateH265    = 1,//正在解码的是h265
@@ -385,25 +385,30 @@ typedef struct
 /**
  播放器实例句柄创建
  */
-- (void)onPlayerHandlerCreated;
+- (void)onPlayerHandlerCreated:(QHVCPlayer *_Nonnull)player;
 
 /**
  播放器销毁
  */
-- (void)onPlayerDestoryed;
+- (void)onPlayerDestoryed:(QHVCPlayer *_Nonnull)player;
 
 /**
  流量计算回调函数
- 
+
  @param dvbps 播放器下行视频每秒字节数
  @param dabps 播放器下行音频每秒字节数
  @param dvfps 播放器下行视频每秒帧数
  @param dafps 播放器下行音频每秒帧数
+ @param fps 当前fps
+ @param bitrate 当前bitrate
  */
-- (void)onPlayerNetStats:(long long)dvbps
-                   dabps:(long long)dabps
-                   dvfps:(long long)dvfps
-                   dafps:(long long)dafps;
+- (void)onPlayerNetStats:(long)dvbps
+                   dabps:(long)dabps
+                   dvfps:(long)dvfps
+                   dafps:(long)dafps
+                     fps:(long)fps
+                 bitrate:(long)bitrate
+                  player:(QHVCPlayer *_Nonnull)player;
 
 /**
  编码方式
@@ -412,7 +417,7 @@ typedef struct
  @param sn sheduled_sn_url
  @param errorCode errorCode
  */
-- (void)onPlayerDecodingType:(QHVCPlayerDecodingType)decodingType sn:(NSString *_Nullable)sn errorCode:(int)errorCode;
+- (void)onPlayerDecodingType:(QHVCPlayerDecodingType)decodingType sn:(NSString *_Nullable)sn errorCode:(int)errorCode player:(QHVCPlayer *_Nonnull)player;
 
 @end
 

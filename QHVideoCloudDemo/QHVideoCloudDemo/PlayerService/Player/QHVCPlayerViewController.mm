@@ -17,7 +17,7 @@
 
 #define NotificationLock CFSTR("com.apple.springboard.lockcomplete")
 
-static NSString * const APP_SIGN = @"key_2Zjurl^y5t{6O;<6L";
+static NSString * const APP_SIGN = @"";
 
 @interface QHVCPlayerViewController ()<QHVCPlayerDelegate, QHVCPlayerAdvanceDelegate, QHVCSliderDelegate, UITableViewDelegate, UITableViewDataSource, UIActionSheetDelegate>
 {
@@ -57,7 +57,10 @@ static NSString * const APP_SIGN = @"key_2Zjurl^y5t{6O;<6L";
     BOOL isHardDecode;
     NSString *sn;
     
-    long long downstreamTraffic;
+    long _downstreamTraffic;
+    long _fps;
+    long _bitrate;
+    
     NSInteger resolutionIndex;
     NSInteger multipleRateIndex;
     
@@ -181,7 +184,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 
 - (void)initLivePlayer
 {
-    _player = [[QHVCPlayer alloc] initWithSN:sn channelId:cid userId:nil uSign:[self generateSign:APP_SIGN] options:@{@"dispatchUrl":@"http://g2.live.360.cn/"}];
+    _player = [[QHVCPlayer alloc] initWithSN:sn channelId:cid userId:nil uSign:[self generateSign:APP_SIGN] options:nil];
     _player.playerDelegate = self;
     _player.playerAdvanceDelegate = self;
     playerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_SIZE.width, SCREEN_SIZE.width * SCREEN_SCALE)];
@@ -191,28 +194,17 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 
 - (NSString *)generateSign:(NSString *)_key
 {
-    NSString *channelTag = @"channel__";
-    NSString *appName = cid;
-    NSString *snTag = @"sn__";
-    NSString *key = _key;
-    NSString *sign = [NSString stringWithFormat:@"%@%@%@%@%@", channelTag, appName, snTag, sn, key];
-    
-    gnet::MD5_CTX md5;
-    MD5_Init(&md5);
-    MD5_Update(&md5, [sign cStringUsingEncoding:NSUTF8StringEncoding], strlen([sign cStringUsingEncoding:NSUTF8StringEncoding]));
-    unsigned char result[16];
-    MD5_Final(result, &md5);
-    
     NSMutableString *hash = [NSMutableString string];
-    for (int i = 0; i < 16; i++)
-        [hash appendFormat:@"%02X", result[i]];
+    
     return [hash lowercaseString];
 }
 
 #pragma mark PlayerAdvanceDelegate
-- (void)onPlayerNetStats:(long long)dvbps dabps:(long long)dabps dvfps:(long long)dvfps dafps:(long long)dafps
+- (void)onPlayerNetStats:(long)dvbps dabps:(long)dabps dvfps:(long)dvfps dafps:(long)dafps fps:(long)fps bitrate:(long)bitrate player:(QHVCPlayer *)player
 {
-    downstreamTraffic = dvbps + dabps;
+    _downstreamTraffic = dvbps + dabps;
+    _fps = fps;
+    _bitrate = bitrate/1024;
 }
 
 #pragma mark PlayerDelegate
@@ -220,7 +212,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  播放器准备成功回调,在此回调中调用play开始播放
  */
-- (void)onPlayerPrepared
+- (void)onPlayerPrepared:(QHVCPlayer *)player
 {
     [_player play];
     playPauseButton.selected = YES;
@@ -230,7 +222,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  播放器渲染第一帧
  */
-- (void)onPlayerFirstFrameRender:(NSDictionary *)mediaInfo
+- (void)onPlayerFirstFrameRender:(NSDictionary *)mediaInfo player:(QHVCPlayer *)player
 {
     NSString *version = [NSString stringWithUTF8String:(char *)QHVCPlayerKitVersionString];//版本号
     NSString *url = testUrl;//播放url
@@ -241,7 +233,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
     NSString *sample_rate = [mediaInfo valueForKey:@"sample_rate"];//采样率
     NSString *channel = [mediaInfo valueForKey:@"channel"];//音频轨道
     NSString *vdec_name = [mediaInfo valueForKey:@"vdec_name"];//视频编码格式
-    NSString *downloadFlow = [self convertSize:downstreamTraffic];//下行流量
+    NSString *downloadFlow = [self convertSize:_downstreamTraffic];//下行流量
     NSString *currentTime = @"";//已播时长
     NSString *netType = @"";//网络类型
     _dataSource = @[
@@ -264,7 +256,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  播放结束回调
  */
-- (void)onPlayerFinish
+- (void)onPlayerFinish:(QHVCPlayer *)player
 {
     [_player seekTo:0];
     [_player pause];
@@ -289,7 +281,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
  * @param width  视频宽度
  * @param height 视频高度
  */
-- (void)onPlayerSizeChanged:(int)width height:(int)height
+- (void)onPlayerSizeChanged:(int)width height:(int)height player:(QHVCPlayer *)player
 {
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if (width > height)
@@ -307,7 +299,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  开始缓冲(buffer为空，触发loading)
  */
-- (void)onPlayerBufferingBegin
+- (void)onPlayerBufferingBegin:(QHVCPlayer *)player
 {
     [totalTimeLabel setText:[self formatedTime:[_player getDuration]]];
     [hudManager showLoadingProgressOnView:playerView message:@"loading..."];
@@ -318,7 +310,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
  *
  * @param progress 缓冲进度，progress==0表示开始缓冲， progress==100表示缓冲结束
  */
-- (void)onPlayerBufferingUpdate :(int)progress
+- (void)onPlayerBufferingUpdate :(int)progress player:(QHVCPlayer *)player
 {
 
 }
@@ -326,7 +318,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  缓冲完成(buffer loading完成，可以继续播放)
  */
-- (void)onPlayerBufferingComplete
+- (void)onPlayerBufferingComplete:(QHVCPlayer *)player
 {
     [hudManager hideHud];
 }
@@ -334,7 +326,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  * 拖动操作缓冲完成
  */
-- (void)onPlayerSeekComplete
+- (void)onPlayerSeekComplete:(QHVCPlayer *)player
 {
     
 }
@@ -342,7 +334,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
 /**
  播放进度回调
  */
-- (void)onPlayerPlayingProgress:(CGFloat)progress
+- (void)onPlayerPlayingProgress:(CGFloat)progress player:(QHVCPlayer *)player
 {
     if (!isSliderGliding)
     {
@@ -351,20 +343,20 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
     }
 }
 
-- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *)mediaInfo
+- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *)mediaInfo player:(QHVCPlayer *)player
 {
     if (isTableViewSlide)
         return;
     NSString *version = [NSString stringWithUTF8String:(char *)QHVCPlayerKitVersionString];//版本号
     NSString *url = testUrl;//播放url
     NSString *resolution = [NSString stringWithFormat:@"%@*%@", [mediaInfo valueForKey:@"width"], [mediaInfo valueForKey:@"height"]];//码率
-    NSString *bitRate = [mediaInfo valueForKey:@"bitrate"];//码率
-    NSString *fps = [mediaInfo valueForKey:@"fps"];//帧率
+    NSString *bitRate = [NSString stringWithFormat:@"%ld", _bitrate];//码率
+    NSString *fps = [NSString stringWithFormat:@"%ld", _fps];//帧率
     NSString *adec_name = [mediaInfo valueForKey:@"adec_name"];//音频格式
     NSString *sample_rate = [mediaInfo valueForKey:@"sample_rate"];//采样率
     NSString *channel = [mediaInfo valueForKey:@"channel"];//音频轨道
     NSString *vdec_name = [mediaInfo valueForKey:@"vdec_name"];//视频编码格式
-    NSString *downloadFlow = [self convertSize:downstreamTraffic];//下行流量
+    NSString *downloadFlow = [self convertSize:_downstreamTraffic];//下行流量
     NSString *currentTime = [NSString stringWithFormat:@"%0.1f s", [_player getCurrentPosition]];//已播时长
     NSString *netType = [mediaInfo valueForKey:@"netType"];//网络类型
     _dataSource = @[
@@ -391,7 +383,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
  * @param error       错误类型
  * @param extraInfo   额外的信息
  */
-- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo
+- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo player:(QHVCPlayer *)player
 {
     NSLog(@"error:%ld", (long)extraInfo);//播放器初始化I/O错误要重新初始化player
 }
@@ -402,7 +394,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
  * @param info  参见状态信息枚举
  * @param extraInfo 扩展信息
  */
-- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString * _Nullable)extraInfo
+- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString * _Nullable)extraInfo player:(QHVCPlayer *)player
 {
     if ([extraInfo isEqualToString:@"play"])
     {
@@ -412,12 +404,12 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
     NSLog(@"PlayerStatus:%@", extraInfo);
 }
 
-- (void)onPlayerSwitchResolutionSuccess:(int)index
+- (void)onPlayerSwitchResolutionSuccess:(int)index player:(QHVCPlayer *)player
 {
     [hudManager showTextOnlyAlertViewOnView:playerView message:@"切换码率成功" hideFlag:YES];
 }
 
-- (void)onPlayerSwitchResolutionFailed:(NSString *)errorMsg
+- (void)onPlayerSwitchResolutionFailed:(NSString *)errorMsg player:(QHVCPlayer *)player
 {
     [hudManager showTextOnlyAlertViewOnView:playerView message:[NSString stringWithFormat:@"切换码率失败:%@", errorMsg] hideFlag:YES];
 }
@@ -1161,7 +1153,7 @@ static void screenLockStateChanged(CFNotificationCenterRef center,void* observer
     NSString *minStr = [NSString stringWithFormat:@"%ld", (long)minute];
     if (minute < 10)
     {
-        minStr = [NSString stringWithFormat:@"0%ld", minute];
+        minStr = [NSString stringWithFormat:@"0%ld", (long)minute];
     }
     int second = (int)timeDuration % 60;
     formatedString = [NSString stringWithFormat:@"%@:%02d",minStr,second];

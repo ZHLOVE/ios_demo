@@ -86,6 +86,8 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
     QHVCPlayerLogLevelFatal = 6,//fatal
 };
 
+@class QHVCPlayer;
+
 /**
  播放器状态delegate
  */
@@ -95,17 +97,17 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
 /**
  播放器首次加载缓冲准备完毕，在此回调中调用play开始播放
  */
-- (void)onPlayerPrepared;
+- (void)onPlayerPrepared:(QHVCPlayer *_Nonnull)player;
 
 /**
  播放器首屏渲染，可以显示第一帧画面
  */
-- (void)onPlayerFirstFrameRender:(NSDictionary *_Nullable)mediaInfo;
+- (void)onPlayerFirstFrameRender:(NSDictionary *_Nullable)mediaInfo player:(QHVCPlayer *_Nonnull)player;
 
 /**
  播放结束回调
  */
-- (void)onPlayerFinish;
+- (void)onPlayerFinish:(QHVCPlayer *_Nonnull)player;
 
 @optional
 /**
@@ -114,43 +116,43 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
  * @param width  视频宽度
  * @param height 视频高度
  */
-- (void)onPlayerSizeChanged:(int)width height:(int)height;
+- (void)onPlayerSizeChanged:(int)width height:(int)height player:(QHVCPlayer *_Nonnull)player;
 
 /**
  开始缓冲(buffer为空，触发loading)
  */
-- (void)onPlayerBufferingBegin;
+- (void)onPlayerBufferingBegin:(QHVCPlayer *_Nonnull)player;
 
 /**
  * 缓冲进度(buffer loading进度)
  *
  * @param progress 缓冲进度，progress==0表示开始缓冲， progress==100表示缓冲结束
  */
-- (void)onPlayerBufferingUpdate:(int)progress;
+- (void)onPlayerBufferingUpdate:(int)progress player:(QHVCPlayer *_Nonnull)player;
 
 /**
  缓冲完成(buffer loading完成，可以继续播放)
  */
-- (void)onPlayerBufferingComplete;
+- (void)onPlayerBufferingComplete:(QHVCPlayer *_Nonnull)player;
 
 /**
  播放进度回调
 
  @param progress 播放进度
  */
-- (void)onPlayerPlayingProgress:(CGFloat)progress;
+- (void)onPlayerPlayingProgress:(CGFloat)progress player:(QHVCPlayer *_Nonnull)player;
 
 /**
  测试用
 
- @param mediaInfo 视频详细参数
+ @param mediaInfo 视频详细参数(点播专用)
  */
-- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *_Nullable)mediaInfo;
+- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *_Nullable)mediaInfo player:(QHVCPlayer *_Nonnull)player;
 
 /**
  * 拖动操作缓冲完成
  */
-- (void)onPlayerSeekComplete;
+- (void)onPlayerSeekComplete:(QHVCPlayer *_Nonnull)player;
 
 /**
  * 播放器错误回调
@@ -158,7 +160,7 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
  * @param error       错误类型
  * @param extraInfo   额外的信息
  */
-- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo;
+- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo player:(QHVCPlayer *_Nonnull)player;
 
 /**
  * 播放状态回调
@@ -166,26 +168,26 @@ typedef NS_ENUM(NSInteger, QHVCPlayerLogLevel)
  * @param info  参见状态信息枚举
  * @param extraInfo 扩展信息
  */
-- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString * _Nullable)extraInfo;
+- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString * _Nullable)extraInfo player:(QHVCPlayer *_Nonnull)player;
 
 /**
  码率切换成功
 
  @param index 播放index
  */
-- (void)onPlayerSwitchResolutionSuccess:(int)index;
+- (void)onPlayerSwitchResolutionSuccess:(int)index player:(QHVCPlayer *_Nonnull)player;
 
 /**
  码率切换失败
 
  @param errorMsg errorMsg description
  */
-- (void)onPlayerSwitchResolutionFailed:(NSString *_Nullable)errorMsg;
+- (void)onPlayerSwitchResolutionFailed:(NSString *_Nullable)errorMsg player:(QHVCPlayer *_Nonnull)player;
 
 /**
  主播切入后台
  */
-- (void)onPlayerAnchorInBackground;
+- (void)onPlayerAnchorInBackground:(QHVCPlayer *_Nonnull)player;
 
 @end
 

@@ -357,7 +357,7 @@
 /**
  播放器准备成功回调,在此回调中调用play开始播放
  */
-- (void)onPlayerPrepared
+- (void)onPlayerPrepared:(QHVCPlayer *)player
 {
     [_player play];
     [_player openNetStats:5];
@@ -366,7 +366,7 @@
 /**
  播放器渲染第一帧
  */
-- (void)onPlayerFirstFrameRender:(NSDictionary *)mediaInfo
+- (void)onPlayerFirstFrameRender:(NSDictionary *)mediaInfo player:(QHVCPlayer *)player
 {
     
 }
@@ -374,7 +374,7 @@
 /**
  播放结束回调
  */
-- (void)onPlayerFinish
+- (void)onPlayerFinish:(QHVCPlayer *)player
 {
     [_currrentPlayerView finish];
 }
@@ -387,7 +387,7 @@
  * @param width  视频宽度
  * @param height 视频高度
  */
-- (void)onPlayerSizeChanged:(int)width height:(int)height
+- (void)onPlayerSizeChanged:(int)width height:(int)height player:(QHVCPlayer *)player
 {
     
 }
@@ -395,7 +395,7 @@
 /**
  开始缓冲(buffer为空，触发loading)
  */
-- (void)onPlayerBufferingBegin
+- (void)onPlayerBufferingBegin:(QHVCPlayer *)player
 {
     [_currrentPlayerView beginBuffing];
 }
@@ -405,7 +405,7 @@
  *
  * @param progress 缓冲进度，progress==0表示开始缓冲， progress==100表示缓冲结束
  */
-- (void)onPlayerBufferingUpdate :(int)progress
+- (void)onPlayerBufferingUpdate :(int)progress player:(QHVCPlayer *)player
 {
     [_currrentPlayerView bufferingUpdate:progress];
 }
@@ -413,7 +413,7 @@
 /**
  缓冲完成(buffer loading完成，可以继续播放)
  */
-- (void)onPlayerBufferingComplete
+- (void)onPlayerBufferingComplete:(QHVCPlayer *)player
 {
     [_currrentPlayerView bufferingComplete];
 }
@@ -421,7 +421,7 @@
 /**
  * 拖动操作缓冲完成
  */
-- (void)onPlayerSeekComplete
+- (void)onPlayerSeekComplete:(QHVCPlayer *)player
 {
     [_currrentPlayerView buffingSeekComplete];
 }
@@ -429,12 +429,12 @@
 /**
  播放进度回调
  */
-- (void)onPlayerPlayingProgress:(CGFloat)progress
+- (void)onPlayerPlayingProgress:(CGFloat)progress player:(QHVCPlayer *)player
 {
     [_currrentPlayerView updateplayProgress:progress];
 }
 
-- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *)mediaInfo
+- (void)onplayerPlayingUpdatingMediaInfo:(NSDictionary *)mediaInfo player:(QHVCPlayer *)player
 {
     
 }
@@ -445,7 +445,7 @@
  * @param error       错误类型
  * @param extraInfo   额外的信息
  */
-- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo
+- (void)onPlayerError:(QHVCPlayerError) error extra:(QHVCPlayerErrorDetailedInfo)extraInfo player:(QHVCPlayer *)player
 {
     NSLog(@"error:%ld", (long)extraInfo);//播放器初始化I/O错误要重新初始化player
 }
@@ -456,17 +456,17 @@
  * @param info  参见状态信息枚举
  * @param extraInfo 扩展信息
  */
-- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString * _Nullable)extraInfo
+- (void)onPlayerInfo:(QHVCPlayerStatus)info extra:(NSString *)extraInfo player:(QHVCPlayer *)player
 {
     [_tableView reloadData];
 }
 
-- (void)onPlayerSwitchResolutionSuccess:(int)index
+- (void)onPlayerSwitchResolutionSuccess:(int)index player:(QHVCPlayer *)player
 {
     
 }
 
-- (void)onPlayerSwitchResolutionFailed:(NSString *)errorMsg
+- (void)onPlayerSwitchResolutionFailed:(NSString *)errorMsg player:(QHVCPlayer *)player
 {
     [hudManager showTextOnlyAlertViewOnView:_playerView message:[NSString stringWithFormat:@"切换分辨率失败:%@", errorMsg] hideFlag:YES];
 }
